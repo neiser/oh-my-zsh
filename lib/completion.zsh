@@ -48,6 +48,33 @@ zstyle ':completion:*:hosts' hosts $hosts
 zstyle ':completion::complete:*' use-cache 1
 zstyle ':completion::complete:*' cache-path $ZSH/cache/
 
+# allow approximate
+zstyle ':completion:*' completer _complete _match _approximate _force_rehash
+zstyle ':completion:*:match:*' original only
+# the longer the word, the more approximate
+zstyle -e ':completion:*:approximate:*' max-errors 'reply=( $(( ($#PREFIX+$#SUFFIX)/3 )) numeric )'
+
+# remove trailing slashes
+zstyle ':completion:*' squeeze-slashes true
+
+
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' menu yes=long-list
+zstyle ':completion:*' menu select=2
+
+# ignore some things
+zstyle ':completion:*:functions' ignored-patterns '_*'
+zstyle ':completion:*:(rm|kill|diff):*' ignore-line yes
+
+
+# cd not select parent dir.
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+
+zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
+zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
+
+
+
 # Don't complete uninteresting users
 zstyle ':completion:*:*:*:users' ignored-patterns \
         adm amanda apache avahi beaglidx bin cacti canna clamav daemon \
@@ -70,3 +97,9 @@ if [ "x$COMPLETION_WAITING_DOTS" = "xtrue" ]; then
   zle -N expand-or-complete-with-dots
   bindkey "^I" expand-or-complete-with-dots
 fi
+
+# helper function which rehashes automatically
+_force_rehash() {
+    (( CURRENT == 1 )) && rehash
+    return 1	# Because we didn't really complete anything
+}
