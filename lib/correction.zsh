@@ -1,3 +1,4 @@
+return
 setopt correct_all
 
 alias man='nocorrect man'
